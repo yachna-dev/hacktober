@@ -1,22 +1,19 @@
 "use client";
 
 import { Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react";
-import type { Track } from "@/lib/tracks";
 
 interface PlayerBarProps {
-  track: Track;
+  track: { title: string; artist: string };
   playing: boolean;
   currentTime: number;
   duration: number;
   volume: number;
-  hissOn: boolean;
   canSkip: boolean;
   onToggle: () => void;
   onNext: () => void;
   onPrev: () => void;
   onSeek: (seconds: number) => void;
   onVolume: (volume: number) => void;
-  onToggleHiss: () => void;
 }
 
 function formatTime(value: number): string {
@@ -47,23 +44,15 @@ export default function PlayerBar({
   currentTime,
   duration,
   volume,
-  hissOn,
   canSkip,
   onToggle,
   onNext,
   onPrev,
   onSeek,
   onVolume,
-  onToggleHiss,
 }: PlayerBarProps) {
   const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
   const spinning = playing;
-
-  const hissClass = `flex h-9 items-center justify-center gap-1.5 rounded-full border px-3 text-xs transition-all ${
-    hissOn
-      ? "border-[#f6e7c9]/60 bg-[#f6e7c9]/20 text-[#f6e7c9] shadow-[0_0_18px_rgba(246,231,201,0.35)]"
-      : "border-white/15 bg-white/5 text-white/65 hover:border-white/30 hover:text-white"
-  }`;
 
   return (
     <div className="glass flex w-full flex-col gap-2.5 rounded-[26px] px-3.5 py-3 sm:px-5 sm:py-3.5">
@@ -146,29 +135,7 @@ export default function PlayerBar({
             }}
             aria-label="Volume"
           />
-          <button
-            type="button"
-            onClick={onToggleHiss}
-            className={hissClass}
-            aria-pressed={hissOn}
-            aria-label="Toggle vinyl hiss"
-            title="Vintage vinyl crackle"
-          >
-            <span aria-hidden>📻</span>
-            <span>Hiss</span>
-          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={onToggleHiss}
-          className={`${hissClass} w-9 px-0 md:hidden`}
-          aria-pressed={hissOn}
-          aria-label="Toggle vinyl hiss"
-          title="Vintage vinyl crackle"
-        >
-          <span aria-hidden>📻</span>
-        </button>
       </div>
 
       <div className="flex items-center gap-3">

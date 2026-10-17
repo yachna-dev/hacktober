@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# raw vibe source assets (curated copies live in /public/audio and /public/vibes)
+/Vibes/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

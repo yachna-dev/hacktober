@@ -1,7 +1,9 @@
 import type { Scene } from "./scenes";
+import type { LocalTrack } from "./tracks";
 
 export interface Vibe extends Scene {
   photo?: string;
+  tracks?: LocalTrack[];
 }
 
 export const VIBES: Vibe[] = [
@@ -22,6 +24,12 @@ export const VIBES: Vibe[] = [
       { id: "murmur", label: "Baithak", hint: "log baat karte hue", volume: 0.35 },
       { id: "hum", label: "Fan / cooler", hint: "slow hum", volume: 0.3 },
     ],
+    tracks: [
+      { title: "Is Tarah Aashiqui Ka", artist: "Kumar Sanu", src: "/audio/saloon/01-is-tarah-aashiqui-ka.mp3" },
+      { title: "Jaadu Teri Nazar", artist: "Udit Narayan", src: "/audio/saloon/02-jaadu-teri-nazar.mp3" },
+      { title: "Mujhse Mohabbat Ka Izhaar", artist: "Kumar Sanu & Alka Yagnik", src: "/audio/saloon/03-mujhse-mohabbat-ka-izhaar.mp3" },
+      { title: "Saloon Classic", artist: "Purana cassette", src: "/audio/saloon/04-saloon-classic.mp3" },
+    ],
   },
   {
     id: "barish",
@@ -38,6 +46,11 @@ export const VIBES: Vibe[] = [
       { id: "clinks", label: "Chai & chammach", hint: "chhota-sa clink", volume: 0.35 },
       { id: "murmur", label: "Halki baatein", hint: "kamre ki goonj", volume: 0.3 },
       { id: "hum", label: "AC / fan", hint: "steady hum", volume: 0.25 },
+    ],
+    tracks: [
+      { title: "Kabhi Jo Baadal Barse", artist: "Arijit Singh", src: "/audio/barish/01-kabhi-jo-baadal-barse.mp3" },
+      { title: "Rafta Rafta", artist: "Atif Aslam", src: "/audio/barish/02-rafta-rafta.mp3" },
+      { title: "Tere Liye", artist: "Atif Aslam & Shreya Ghoshal", src: "/audio/barish/03-tere-liye.mp3" },
     ],
   },
   {
@@ -56,6 +69,10 @@ export const VIBES: Vibe[] = [
       { id: "radio", label: "Transistor", hint: "battery wala radio", volume: 0.25 },
       { id: "birds", label: "Titaliyan", hint: "chhat pe", volume: 0.12 },
     ],
+    tracks: [
+      { title: "Jaadu Teri Nazar", artist: "Udit Narayan", src: "/audio/saloon/02-jaadu-teri-nazar.mp3" },
+      { title: "Kabhi Jo Baadal Barse", artist: "Arijit Singh", src: "/audio/barish/01-kabhi-jo-baadal-barse.mp3" },
+    ],
   },
   {
     id: "barati",
@@ -66,12 +83,18 @@ export const VIBES: Vibe[] = [
     accent: "#ff6fae",
     palette: ["#1b0714", "#3a0f2c", "#5c1938"],
     particle: "dust",
+    photo: "/vibes/barati/bg.jpg",
     layers: [
       { id: "horn", label: "Horn", hint: "koi rasta do!", volume: 0.55 },
       { id: "murmur", label: "Bheed", hint: "log, bacche, shor", volume: 0.5 },
       { id: "clinks", label: "Ghungroo", hint: "thoda-sa chhanak", volume: 0.35 },
       { id: "traffic", label: "Gaadiyan", hint: "gali me jam", volume: 0.3 },
       { id: "buzz", label: "Generator", hint: "bina rukey buzz", volume: 0.2 },
+    ],
+    tracks: [
+      { title: "Chunnari Chunnari", artist: "Abhijeet & Anuradha Sriram", src: "/audio/barati/01-chunnari-chunnari.mp3" },
+      { title: "Gallan Goodiyaan", artist: "Farhan Akhtar & ensemble", src: "/audio/barati/02-gallan-goodiyaan.mp3" },
+      { title: "Oh Ho Ho Ho (Remix)", artist: "Zack Knight & Jasmin Walia", src: "/audio/barati/03-oh-ho-ho-ho-remix.mp3" },
     ],
   },
   {
@@ -83,12 +106,16 @@ export const VIBES: Vibe[] = [
     accent: "#ffb26b",
     palette: ["#150f08", "#31200f", "#4a3016"],
     particle: "dust",
+    photo: "/vibes/chai/bg.jpg",
     layers: [
       { id: "clinks", label: "Katori & chammach", hint: "chai ke toast", volume: 0.5 },
       { id: "murmur", label: "Tapri baatein", hint: "ghar, cricket, neta ji", volume: 0.45 },
       { id: "traffic", label: "Sadak", hint: "paas ki bheed", volume: 0.35 },
       { id: "hum", label: "Stove", hint: "dheemi aanch", volume: 0.25 },
       { id: "birds", label: "Kabootar", hint: "chaari pe", volume: 0.15 },
+    ],
+    tracks: [
+      { title: "Jaadu Teri Nazar", artist: "Udit Narayan", src: "/audio/chai/01-jaadu-teri-nazar.mp3" },
     ],
   },
   {
@@ -107,6 +134,10 @@ export const VIBES: Vibe[] = [
       { id: "clinks", label: "Taash ke patte", hint: "gerha, chhota", volume: 0.3 },
       { id: "traffic", label: "Bahar", hint: "colony ki awaaz", volume: 0.2 },
     ],
+    tracks: [
+      { title: "Gallan Goodiyaan", artist: "Farhan Akhtar & ensemble", src: "/audio/barati/02-gallan-goodiyaan.mp3" },
+      { title: "Chunnari Chunnari", artist: "Abhijeet & Anuradha Sriram", src: "/audio/barati/01-chunnari-chunnari.mp3" },
+    ],
   },
   {
     id: "bus",
@@ -117,12 +148,17 @@ export const VIBES: Vibe[] = [
     accent: "#f2b06b",
     palette: ["#141018", "#2a1c14", "#3f2a17"],
     particle: "dust",
+    photo: "/vibes/bus/bg.jpg",
     layers: [
       { id: "hum", label: "Engine", hint: "dheemi dhadkan", volume: 0.6 },
       { id: "traffic", label: "Sarak", hint: "bahar ki bheed", volume: 0.45 },
       { id: "horn", label: "Horn", hint: "door se…", volume: 0.5 },
       { id: "radio", label: "Driver ka radio", hint: "loud gaana", volume: 0.5 },
       { id: "murmur", label: "Sawariyan", hint: "logon ki pink noise", volume: 0.3 },
+    ],
+    tracks: [
+      { title: "Rafta Rafta", artist: "Atif Aslam", src: "/audio/barish/02-rafta-rafta.mp3" },
+      { title: "Tere Liye", artist: "Atif Aslam & Shreya Ghoshal", src: "/audio/barish/03-tere-liye.mp3" },
     ],
   },
   {
@@ -134,11 +170,16 @@ export const VIBES: Vibe[] = [
     accent: "#7fe0d0",
     palette: ["#071614", "#0f2c28", "#164740"],
     particle: "dust",
+    photo: "/vibes/bartan/bg.jpg",
     layers: [
       { id: "clinks", label: "Bartan", hint: "khankh-hankh", volume: 0.6 },
       { id: "murmur", label: "Mummy ki daant", hint: "halki-sarki", volume: 0.4 },
       { id: "radio", label: "Gaana", hint: "loudspeaker", volume: 0.35 },
       { id: "hum", label: "Paani", hint: "tap ka hum", volume: 0.3 },
+    ],
+    tracks: [
+      { title: "Maahi", artist: "From Raaz - The Mystery Continues", src: "/audio/bartan/01-maahi.mp3" },
+      { title: "O Mere Khuda", artist: "Atif Aslam & Garima Jhingon", src: "/audio/bartan/02-o-mere-khuda.mp3" },
     ],
   },
   {
@@ -150,14 +191,20 @@ export const VIBES: Vibe[] = [
     accent: "#e0a3ff",
     palette: ["#120718", "#2a1030", "#42184a"],
     particle: "dust",
+    photo: "/vibes/qawali/bg.jpg",
     layers: [
       { id: "radio", label: "Harmonium", hint: "khich ke sur", volume: 0.6 },
       { id: "murmur", label: "Mehfil", hint: "wah-wah", volume: 0.5 },
       { id: "clinks", label: "Taali", hint: "dham-dham", volume: 0.35 },
       { id: "hum", label: "Dholak", hint: "gehari thap", volume: 0.3 },
     ],
+    tracks: [
+      { title: "Dekhte Dekhte", artist: "Atif Aslam", src: "/audio/qawali/01-dekhte-dekhte.mp3" },
+    ],
   },
 ];
+
+export const FALLBACK_TRACKS: LocalTrack[] = VIBES[0].tracks ?? [];
 
 export function getVibe(id: string): Vibe {
   return VIBES.find((vibe) => vibe.id === id) ?? VIBES[0];

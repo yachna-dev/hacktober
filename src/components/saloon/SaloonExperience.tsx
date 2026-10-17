@@ -1,13 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, Download, ListMusic, Play, Radio } from "lucide-react";
-import { AmbientEngine } from "@/lib/audio/engine";
-import { VinylHiss } from "@/lib/audio/crackle";
-import { PLAYLISTS, SITE, TRACKS } from "@/lib/tracks";
-import { getVibe, VIBES } from "@/lib/vibes";
-import { useYouTubePlayer } from "@/lib/useYouTubePlayer";
+import { PLAYLISTS, SITE } from "@/lib/tracks";
+import { FALLBACK_TRACKS, getVibe, VIBES } from "@/lib/vibes";
+import { useLocalPlayer } from "@/lib/useLocalPlayer";
 import Particles from "../Particles";
 import GlassModal from "./GlassModal";
 import PlayerBar from "./PlayerBar";
@@ -38,29 +36,17 @@ const pillClass =
   "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white sm:px-3.5";
 
 export default function SaloonExperience() {
-  const [trackIndex, setTrackIndex] = useState(0);
-  const [hissOn, setHissOn] = useState(false);
   const [modal, setModal] = useState<ModalKind>(null);
   const [clock, setClock] = useState("");
   const [vibeId, setVibeId] = useState(VIBES[0].id);
+  const [started, setStarted] = useState(false);
   const [installEvent, setInstallEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
 
-  const hissRef = useRef<VinylHiss | null>(null);
-  const ambientRef = useRef<AmbientEngine | null>(null);
-  const ytContainerRef = useRef<HTMLDivElement | null>(null);
-  const track = TRACKS[trackIndex];
   const vibe = getVibe(vibeId);
-
-  const next = useCallback(() => {
-    setTrackIndex((prev) => (prev + 1) % TRACKS.length);
-  }, []);
-  const prev = useCallback(() => {
-    setTrackIndex((value) => (value - 1 + TRACKS.length) % TRACKS.length);
-  }, []);
-  const restart = useCallback(() => setTrackIndex(0), []);
-
-  const player = useYouTubePlayer(ytContainerRef, track.id, TRACKS.length, restart, next);
+  const localTracks = vibe.tracks ?? FALLBACK_TRACKS;
+  const player = useLocalPlayer(localTracks);
+  const displayTrack = player.track ?? FALLBACK_TRACKS[0];
 
   useEffect(() => {
     const tick = () => {
@@ -81,44 +67,6 @@ export default function SaloonExperience() {
   }, []);
 
   useEffect(() => {
-    const engine = new AmbientEngine();
-    ambientRef.current = engine;
-    return () => {
-      engine.dispose();
-      ambientRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const engine = ambientRef.current;
-    if (!engine) return;
-    if (!player.playing) {
-      engine.stopAll();
-      return;
-    }
-    const specs = vibe.layers.map((layer) => ({
-      id: layer.id,
-      volume: layer.volume,
-    }));
-    void engine.setScene(specs, vibe.id);
-  }, [player.playing, vibe]);
-
-  useEffect(() => {
-    hissRef.current = new VinylHiss();
-    return () => {
-      hissRef.current?.dispose();
-      hissRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const hiss = hissRef.current;
-    if (!hiss) return;
-    if (hissOn) void hiss.start();
-    else hiss.stop();
-  }, [hissOn]);
-
-  useEffect(() => {
     const handler = (event: Event) => {
       event.preventDefault();
       setInstallEvent(event as BeforeInstallPromptEvent);
@@ -127,26 +75,19 @@ export default function SaloonExperience() {
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  const startVibe = useCallback(() => {
-    const engine = ambientRef.current;
-    if (!engine) return;
-    void engine.start();
-    engine.setMasterVolume(0.6);
-  }, []);
-
   const playAll = useCallback(() => {
-    startVibe();
+    setStarted(true);
     player.play();
-  }, [player, startVibe]);
+  }, [player]);
 
   const toggleAll = useCallback(() => {
-    if (!player.playing) startVibe();
+    setStarted(true);
     player.toggle();
-  }, [player, startVibe]);
+  }, [player]);
 
   const selectTrack = (index: number) => {
-    setTrackIndex(index);
-    startVibe();
+    setStarted(true);
+    player.select(index);
     player.play();
     setModal(null);
   };
@@ -208,13 +149,6 @@ export default function SaloonExperience() {
         }}
       />
       <Particles scene={vibe} />
-
-      <div
-        className="pointer-events-none fixed -bottom-40 -left-40 z-0 h-40 w-60 opacity-0"
-        aria-hidden
-      >
-        <div ref={ytContainerRef} />
-      </div>
 
       <header className="fixed inset-x-0 top-0 z-20 px-3 pt-3 sm:px-6 sm:pt-5">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 sm:justify-between">
@@ -291,7 +225,7 @@ export default function SaloonExperience() {
       </header>
 
       <AnimatePresence>
-        {!player.started && (
+        {!started && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -329,19 +263,17 @@ export default function SaloonExperience() {
       <div className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-5">
         <div className="mx-auto max-w-5xl">
           <PlayerBar
-            track={track}
+            track={displayTrack}
             playing={player.playing}
             currentTime={player.currentTime}
             duration={player.duration}
             volume={player.volume}
-            hissOn={hissOn}
-            canSkip={TRACKS.length > 1}
+            canSkip={player.canSkip}
             onToggle={toggleAll}
-            onNext={next}
-            onPrev={prev}
+            onNext={player.next}
+            onPrev={player.prev}
             onSeek={player.seek}
             onVolume={player.setVolume}
-            onToggleHiss={() => setHissOn((value) => !value)}
           />
           <p className="mt-2 text-center font-roboto text-[11px] text-white/55 text-shadow-warm">
             <span>Deluxe Saloon · open all hours</span>
@@ -373,6 +305,7 @@ export default function SaloonExperience() {
                 type="button"
                 onClick={() => {
                   setVibeId(item.id);
+                  player.select(0);
                   setModal(null);
                 }}
                 className={`relative flex flex-col items-start gap-1 rounded-2xl border p-3 text-left transition-all ${
@@ -406,22 +339,22 @@ export default function SaloonExperience() {
           })}
         </div>
         <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[11px] leading-relaxed text-white/45">
-          Vibe badalte hi background, accent aur ambient awaaz badal jaayegi. Radio
-          gaana chalta rahega.
+          Vibe badalte hi background, accent aur gaane — sab badal jaate hain. Play
+          button dabao aur dekho.
         </p>
       </GlassModal>
 
       <GlassModal
         open={modal === "songs"}
         onClose={() => setModal(null)}
-        title="Saloon Radio Queue"
+        title={`${vibe.latin} · Radio Queue`}
         subtitle="Abhi baj raha hai, aur aage kya"
       >
         <ul className="flex flex-col gap-1">
-          {TRACKS.map((item, index) => {
-            const active = index === trackIndex;
+          {localTracks.map((item, index) => {
+            const active = index === player.index;
             return (
-              <li key={item.id}>
+              <li key={item.src}>
                 <button
                   type="button"
                   onClick={() => selectTrack(index)}
@@ -444,8 +377,9 @@ export default function SaloonExperience() {
           })}
         </ul>
         <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[11px] leading-relaxed text-white/45">
-          Aur gaane jodne ke liye <code className="text-white/70">src/lib/tracks.ts</code> me
-          TRACKS array update karo — YouTube video ID ke saath.
+          Vibes ke gaane <code className="text-white/70">src/lib/vibes.ts</code> me{" "}
+          <code className="text-white/70">tracks</code> array se aate hain — files{" "}
+          <code className="text-white/70">public/audio/&lt;vibe&gt;/</code> me rakho.
         </p>
       </GlassModal>
 

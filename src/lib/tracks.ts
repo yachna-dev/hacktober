@@ -4,6 +4,12 @@ export interface Track {
   artist: string;
 }
 
+export interface LocalTrack {
+  title: string;
+  artist: string;
+  src: string;
+}
+
 export interface Playlist {
   name: string;
   tagline: string;
